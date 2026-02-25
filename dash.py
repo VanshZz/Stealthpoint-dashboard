@@ -7,8 +7,15 @@ import plotly.express as px
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
 
 # Replace this with your actual connection string from MongoDB Atlas
-MONGO_URI = tokens.MONGO_URI
-
+# MONGO_URI = tokens.MONGO_URI
+try:
+    MONGO_URI = st.secrets["MONGO_URI"]
+except KeyError:
+    st.error("MONGO_URI not found in Secrets! Please add it to the Streamlit Cloud dashboard.")
+    st.stop()
+def get_connect():
+    client = MongoClient(MONGO_URI)
+    return client["Stealthpoint_DB"]
 
 @st.cache_resource
 def get_connect():
