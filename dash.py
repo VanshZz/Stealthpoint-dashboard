@@ -2,13 +2,12 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 import plotly.express as px
-
+import tokens
 # --- CONFIGURATION ---
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
 
 # Replace this with your actual connection string from MongoDB Atlas
-MONGO_URI = "mongodb+srv://vanshgupta1285_db_user:xdl9NngTThUO1Hc3@stealthp.uersuk0.mongodb.net/?appName=StealthP"
-
+MONGO_URI = tokens.MONGO_URI
 
 
 @st.cache_resource
