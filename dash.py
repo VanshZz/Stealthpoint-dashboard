@@ -10,7 +10,7 @@ import requests
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
 # Replace this with your actual connection string from MongoDB Atlas
 MONGO_URI = os.getenv("MONGO_URI") or st.secrets("MONGO_URI")
-midmanurl = os.getenv("MIDMAN_URL") or st.secrets("MIDMAN_URL")
+status_check_URL = os.getenv("STATUS_CHECK_URL") or st.secrets("STATUS_CHECK_URL")
 
 @st.cache_resource
 def get_connect():
@@ -23,7 +23,7 @@ cmds_col = db["commands"]
 screenshot = db["screenshots"]
 outputs = db["output"]
 tab1 , tab2 = st.tabs(["Dashboard", "Command Center"])
-#
+
 # --- SIDEBAR FILTERS ---
 st.sidebar.title("🔍 Search Filters")
 user_search = st.sidebar.text_input("Search by Username")
@@ -33,7 +33,7 @@ sidebar_placeholder = st.sidebar.empty()
 @st.fragment(run_every=6)
 def fetch_live_agents():
     try:
-        response = requests.get(midmanurl , timeout=5)
+        response = requests.get(f"{status_check_URL}/live", timeout=5)
         with sidebar_placeholder.container():
             if response.status_code == 200:
                 data = response.json()
@@ -53,9 +53,19 @@ def fetch_live_agents():
                 st.error("Couldnt reach midman server.")
     except Exception as e:
             st.sidebar.error(f"Fetch Error: {e}")
-
 fetch_live_agents()
 
+def check_midman_status():
+    try:
+        response = requests.get(status_check_URL, timeout=5)
+        if response.status_code == 200:
+            st.sidebar.success("Server Status: Online")
+        else:
+            st.sidebar.error("Server Status: Unreachable")
+    except Exception as e:
+        st.sidebar.error(f"Server Error: {e}")
+
+check_midman_status()
 # --- MAIN DASHBOARD ---
 with tab1:
     st.title("🛡️ StealthPoint: Monitoring Dashboard")
