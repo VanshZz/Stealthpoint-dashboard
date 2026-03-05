@@ -5,15 +5,14 @@ import plotly.express as px
 import time
 import os
 from streamlit_extras.stylable_container import stylable_container
+import requests
 # --- CONFIGURATION ---
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
 # Replace this with your actual connection string from MongoDB Atlas
-MONGO_URI = os.getenv("MONGO_URI")
-# try:
-#     MONGO_URI = st.secrets["MONGO_URI"]
-# except KeyError:
-#     st.error("MONGO_URI not found in Secrets! Please add it to the Streamlit Cloud dashboard.")
-#     st.stop()
+MONGO_URI = os.getenv("MONGO_URI") or st.secrets("MONGO_URI")
+midmanurl = "http://127.0.0.1:5000/live"
+
+
 @st.cache_resource
 def get_connect():
     client = MongoClient(MONGO_URI)
@@ -30,6 +29,33 @@ tab1 , tab2 = st.tabs(["Dashboard", "Command Center"])
 st.sidebar.title("🔍 Search Filters")
 user_search = st.sidebar.text_input("Search by Username")
 ip_search = st.sidebar.text_input("Search by IP Address")
+st.sidebar.title("Live Agents")
+sidebar_placeholder = st.sidebar.empty()
+@st.fragment(run_every=6)
+def fetch_live_agents():
+    try:
+        response = requests.get(midmanurl , timeout=5)
+        with sidebar_placeholder.container():
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    display_list =[]
+                    for ip, info in data.items():
+                        display_list.append({
+                                "IP Address": ip,
+                                "User": info['username'],
+                                "Check-in": info['last_seen']
+                            })
+                    st.success(f"Live Agents: {len(display_list)}")
+                    st.table(display_list)
+                else:
+                    st.warning("No Agents Live Currently.")
+            else:
+                st.error("Couldnt reach midman server.")
+    except Exception as e:
+            st.sidebar.error(f"Fetch Error: {e}")
+
+fetch_live_agents()
 
 # --- MAIN DASHBOARD ---
 with tab1:
