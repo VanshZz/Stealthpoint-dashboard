@@ -6,9 +6,9 @@ import time
 import os
 from streamlit_extras.stylable_container import stylable_container
 import requests
-# --- CONFIGURATION ---
+
 st.set_page_config(page_title="StealthPoint Admin Dashboard", layout="wide")
-# Replace this with your actual connection string from MongoDB Atlas
+
 MONGO_URI = os.getenv("MONGO_URI") or st.secrets("MONGO_URI")
 status_check_URL = os.getenv("STATUS_CHECK_URL") or st.secrets("STATUS_CHECK_URL")
 
@@ -24,7 +24,7 @@ screenshot = db["screenshots"]
 outputs = db["output"]
 tab1 , tab2 = st.tabs(["Dashboard", "Command Center"])
 
-# --- SIDEBAR FILTERS ---
+# SIDEBAR FILTERS
 st.sidebar.title("🔍 Search Filters")
 user_search = st.sidebar.text_input("Search by Username")
 ip_search = st.sidebar.text_input("Search by IP Address")
@@ -66,7 +66,7 @@ def check_midman_status():
         st.sidebar.error(f"Server Error: {e}")
 
 check_midman_status()
-# --- MAIN DASHBOARD ---
+# MAIN DASHBOARD
 with tab1:
     st.title("🛡️ StealthPoint: Monitoring Dashboard")
     st.markdown("---")
